@@ -211,4 +211,41 @@ function eliminatePlayer(player){
     player.alive=false;
     document.getElementById("voteScreen").classList.add("hidden");
 
-    let imposto
+    let impostorsAlive=players.filter(p=>p.role==="Imposteur" && p.alive).length;
+    let villagersAlive=players.filter(p=>p.role==="Villageois" && p.alive).length;
+
+    let result=document.getElementById("resultScreen");
+    result.classList.remove("hidden");
+
+    if(player.role==="Imposteur"){
+        result.innerHTML="<h2>Un imposteur a été éliminé !</h2>";
+    }else{
+        result.innerHTML="<h2>Un villageois a été éliminé...</h2>";
+    }
+
+    if(impostorsAlive===0){
+        result.innerHTML+="<h3>🎉 Les villageois ont gagné !</h3><button onclick='restartGame()'>Rejouer</button>";
+        return;
+    }
+
+    if(impostorsAlive>=villagersAlive){
+        result.innerHTML+="<h3>💀 Les imposteurs ont gagné !</h3><button onclick='restartGame()'>Rejouer</button>";
+        return;
+    }
+
+    result.innerHTML+="<button onclick='nextRound()'>Continuer</button>";
+}
+
+function nextRound(){
+    document.getElementById("resultScreen").classList.add("hidden");
+    startVote();
+}
+
+function restartGame(){
+    location.reload();
+}
+
+</script>
+
+</body>
+</html>
