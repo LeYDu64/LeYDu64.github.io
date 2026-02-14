@@ -59,10 +59,6 @@ button:hover {
     background: #ff6b81;
 }
 
-.secondary {
-    background: #3742fa;
-}
-
 .hidden {
     display: none;
 }
@@ -118,4 +114,116 @@ let players = [];
 let currentPlayer = 0;
 
 let words = [
-["Chat","Tigre]()
+["Chat","Tigre"],["Lion","Panthère"],["Chien","Loup"],
+["Pizza","Burger"],["Pâtes","Riz"],["Frites","Chips"],
+["Voiture","Moto"],["Train","Tram"],["Avion","Hélicoptère"],
+["Plage","Piscine"],["Montagne","Colline"],["Forêt","Jungle"],
+["Ordinateur","Tablette"],["Téléphone","Radio"],["Caméra","Appareil photo"],
+["Film","Série"],["Livre","Magazine"],["Jeu vidéo","Jeu de société"],
+["Hôpital","Clinique"],["École","Université"],
+["Café","Thé"],["Chocolat","Bonbon"],
+["Bateau","Sous-marin"],["Neige","Glace"],
+["Pomme","Poire"],["Fraise","Framboise"],
+["Chaussure","Botte"],["Chemise","Veste"],
+["Soleil","Lune"],["Mer","Océan"],
+["Police","Pompier"],["Roi","Prince"],
+["Supermarché","Boulangerie"],
+["Facebook","Instagram"],
+["Football","Basket"],
+["Paris","Londres"],
+["Netflix","YouTube"]
+];
+
+function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        let j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+function startGame() {
+    let count = parseInt(document.getElementById("playerCount").value);
+    let impostorCount = parseInt(document.getElementById("impostorCount").value);
+
+    if (count < 4) {
+        alert("Minimum 4 joueurs !");
+        return;
+    }
+
+    if (impostorCount < 1) {
+        alert("Minimum 1 imposteur !");
+        return;
+    }
+
+    if (impostorCount >= count) {
+        alert("Il doit y avoir au moins 1 villageois !");
+        return;
+    }
+
+    players = [];
+
+    let randomPair = words[Math.floor(Math.random() * words.length)];
+    let villageWord = randomPair[0];
+    let impostorWord = randomPair[1];
+
+    for (let i = 0; i < count; i++) {
+        players.push({
+            role: "Villageois",
+            word: villageWord
+        });
+    }
+
+    shuffle(players);
+
+    for (let i = 0; i < impostorCount; i++) {
+        players[i].role = "Imposteur";
+        players[i].word = impostorWord;
+    }
+
+    shuffle(players);
+
+    currentPlayer = 0;
+
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("transition").classList.remove("hidden");
+
+    updateTransition();
+}
+
+function updateTransition(){
+    document.getElementById("playerNumber").innerText = currentPlayer + 1;
+}
+
+function showRole() {
+    let player = players[currentPlayer];
+
+    document.getElementById("transition").classList.add("hidden");
+    document.getElementById("reveal").classList.remove("hidden");
+
+    document.getElementById("roleText").innerText = player.role;
+    document.getElementById("wordText").innerText = player.word;
+}
+
+function nextPlayer() {
+    currentPlayer++;
+
+    if (currentPlayer >= players.length) {
+        document.getElementById("reveal").classList.add("hidden");
+        document.getElementById("endScreen").classList.remove("hidden");
+        return;
+    }
+
+    document.getElementById("reveal").classList.add("hidden");
+    document.getElementById("transition").classList.remove("hidden");
+    updateTransition();
+}
+
+function restartGame(){
+    document.getElementById("endScreen").classList.add("hidden");
+    document.getElementById("setup").classList.remove("hidden");
+}
+
+</script>
+
+</body>
+</html>
