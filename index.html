@@ -3,32 +3,97 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2c1b12">
 <title>L'Imposteur du Royaume</title>
+
 <style>
-body{margin:0;font-family:'Segoe UI',sans-serif;background:linear-gradient(135deg,#2c1b12,#1a1a1a);color:white;text-align:center;}
-.container{max-width:500px;margin:auto;padding:20px;}
-.card{background:#2f2f2f;padding:20px;margin-top:20px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-.logo{font-size:28px;font-weight:bold;color:#f1c40f;margin-bottom:10px;}
-input{padding:10px;margin:5px;border-radius:10px;border:none;font-size:16px;}
-button{background:#8e44ad;border:none;padding:12px;margin:8px 0;width:100%;font-size:16px;border-radius:12px;color:white;cursor:pointer;}
-button:hover{background:#9b59b6;}
-.hidden{display:none;}
+body{
+    margin:0;
+    font-family: 'Segoe UI', sans-serif;
+    color:white;
+    text-align:center;
+    background: linear-gradient(-45deg,#2c1b12,#1a1a1a,#3e2723,#1c1c1c);
+    background-size:400% 400%;
+    animation: gradientBG 15s ease infinite;
+}
+
+@keyframes gradientBG{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.container{
+    max-width:500px;
+    margin:auto;
+    padding:20px;
+}
+
+.card{
+    background:#2f2f2f;
+    padding:20px;
+    margin-top:20px;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.6);
+    animation:fadeIn 0.4s ease;
+    transition:all 0.4s ease;
+}
+
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(20px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+.logo{
+    font-size:28px;
+    font-weight:bold;
+    color:#f1c40f;
+}
+
+input{
+    padding:10px;
+    margin:5px;
+    border-radius:10px;
+    border:none;
+    font-size:16px;
+}
+
+button{
+    background:#8e44ad;
+    border:none;
+    padding:12px;
+    margin:8px 0;
+    width:100%;
+    font-size:16px;
+    border-radius:12px;
+    color:white;
+    cursor:pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:hover{ background:#9b59b6; }
+
 .playerButton{background:#2980b9;}
 .playerButton:hover{background:#3498db;}
+
 .ruleBtn{background:#16a085;}
 .resetBtn{background:#c0392b;}
+
+.hidden{display:none;}
 </style>
 </head>
+
 <body>
 
 <div class="container">
+
 <div class="logo">👑 L'Imposteur du Royaume</div>
 
 <div id="setup" class="card">
 <h3>Configuration</h3>
 <input type="number" id="playerCount" min="4" placeholder="Nombre de joueurs">
 <input type="number" id="impostorCount" min="1" placeholder="Nombre d'imposteurs">
-<div><label><input type="checkbox" id="idiotCheck"> Ajouter l'Idiot du Royaume</label></div>
+<label><input type="checkbox" id="idiotToggle"> Ajouter un Idiot du Royaume</label>
 <div id="nameInputs"></div>
 <button onclick="generateNameInputs()">Valider joueurs</button>
 <button onclick="startGame()">Lancer la partie</button>
@@ -37,18 +102,19 @@ button:hover{background:#9b59b6;}
 </div>
 
 <div id="rules" class="card hidden">
-<h3>📜 Règles</h3>
-<p><strong>Villageois :</strong> reçoit un mot et doit le décrire.<br>
-<strong>Imposteur :</strong> reçoit un mot différent proche, doit tromper les villageois.<br>
-<strong>Idiot du Royaume :</strong> n’a pas de mot, doit deviner le mot des villageois.<br>
-Votez ensuite pour éliminer un joueur.<br>
-Victoire : tous les imposteurs éliminés → villageois gagnent, imposteurs ≥ villageois encore en vie → imposteurs gagnent.</p>
+<h3>📜 Rôles</h3>
+<p>
+👨‍🌾 <b>Villageois</b> : Tous ont le même mot et doivent éliminer les imposteurs.<br><br>
+🕵️ <b>Imposteur</b> : Ont un mot légèrement différent et doivent survivre.<br><br>
+🤡 <b>Idiot du Royaume</b> : N’a aucun mot. Il doit deviner celui des villageois lorsqu’il est éliminé.<br><br>
+Condition : Minimum 4 joueurs, minimum 1 imposteur, maximum 1 idiot.
+</p>
 </div>
 
 <div id="transition" class="card hidden">
 <h3>Passe le téléphone à</h3>
 <h2 id="playerName"></h2>
-<button onclick="showWord()">Voir mon mot</button>
+<button onclick="showWord()">Voir mon rôle</button>
 </div>
 
 <div id="reveal" class="card hidden">
@@ -62,67 +128,96 @@ Victoire : tous les imposteurs éliminés → villageois gagnent, imposteurs ≥
 </div>
 
 <div id="resultScreen" class="card hidden"></div>
+
 </div>
 
 <script>
+
 let players=[];
 let currentPlayer=0;
-const words=[["Chat","Tigre"],["Pizza","Burger"],["Roi","Prince"],["Dragon","Dinosaure"]];
-const setup=document.getElementById("setup");
-const transition=document.getElementById("transition");
-const reveal=document.getElementById("reveal");
-const voteScreen=document.getElementById("voteScreen");
-const voteButtons=document.getElementById("voteButtons");
-const resultScreen=document.getElementById("resultScreen");
-const playerName=document.getElementById("playerName");
-const rules=document.getElementById("rules");
+let villageWord="";
+let impostorWord="";
 
-function generateNameInputs(){
-    const playerCount=document.getElementById("playerCount").value;
-    const container=document.getElementById("nameInputs");
-    container.innerHTML="";
-    for(let i=0;i<playerCount;i++){
-        container.innerHTML+=`<input id="name${i}" placeholder="Nom joueur ${i+1}">`;
+const clickSound=new Audio("https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3");
+const winSound=new Audio("https://assets.mixkit.co/active_storage/sfx/1435/1435-preview.mp3");
+
+const words=[
+["Chat","Tigre"],["Pizza","Burger"],
+["Roi","Prince"],["Dragon","Dinosaure"],
+["Plage","Piscine"],["Soleil","Lune"],
+["Football","Basket"],["Vin","Bière"]
+];
+
+function shuffle(array){
+    for(let i=array.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [array[i],array[j]]=[array[j],array[i]];
     }
 }
 
 function getNames(){
-    const playerCount=document.getElementById("playerCount").value;
     let names=[];
-    for(let i=0;i<playerCount;i++){
+    for(let i=0;i<playerCount.value;i++){
         names.push(document.getElementById("name"+i)?.value||("Joueur "+(i+1)));
     }
     return names;
 }
 
-function resetSettings(){
-    localStorage.removeItem("gameSettings");
-    location.reload();
+function generateNameInputs(){
+    let count=parseInt(playerCount.value);
+    let container=document.getElementById("nameInputs");
+    container.innerHTML="";
+    for(let i=0;i<count;i++){
+        let input=document.createElement("input");
+        input.id="name"+i;
+        input.placeholder="Nom joueur "+(i+1);
+        container.appendChild(input);
+    }
 }
 
 function startGame(){
-    const playerCountInput=document.getElementById("playerCount");
-    const impostorCountInput=document.getElementById("impostorCount");
-    const idiotCheck=document.getElementById("idiotCheck").checked;
-    let count=parseInt(playerCountInput.value);
-    let impostors=parseInt(impostorCountInput.value);
-    if(count<4||impostors<1||impostors>=count){alert("Configuration invalide"); return;}
-    if(idiotCheck && count<impostors+2){alert("Trop peu de joueurs pour ajouter l'Idiot"); return;}
+    clickSound.play();
+    let count=parseInt(playerCount.value);
+    let impostors=parseInt(impostorCount.value);
+    let idiot=document.getElementById("idiotToggle").checked;
 
-    const pair=words[Math.floor(Math.random()*words.length)];
-    const names=getNames();
+    if(count<4||impostors<1||impostors>=count){
+        alert("Configuration invalide");
+        return;
+    }
+
     players=[];
+    let pair=words[Math.floor(Math.random()*words.length)];
+    villageWord=pair[0];
+    impostorWord=pair[1];
+
+    let names=getNames();
+
     for(let i=0;i<count;i++){
-        players.push({name:names[i],role:"Villageois",word:pair[0],alive:true});
+        players.push({
+            name:names[i],
+            role:"Villageois",
+            word:villageWord,
+            alive:true
+        });
     }
-    players.sort(()=>Math.random()-0.5);
-    for(let i=0;i<impostors;i++){players[i].role="Imposteur"; players[i].word=pair[1];}
-    if(idiotCheck){
-        let candidates=players.filter(p=>p.role==="Villageois");
-        let random=candidates[Math.floor(Math.random()*candidates.length)];
-        random.role="Idiot du Royaume"; random.word="???";
+
+    shuffle(players);
+
+    for(let i=0;i<impostors;i++){
+        players[i].role="Imposteur";
+        players[i].word=impostorWord;
     }
-    players.sort(()=>Math.random()-0.5);
+
+    if(idiot){
+        let villagers=players.filter(p=>p.role==="Villageois");
+        let chosen=villagers[Math.floor(Math.random()*villagers.length)];
+        chosen.role="Idiot du Royaume";
+        chosen.word="";
+    }
+
+    shuffle(players);
+
     currentPlayer=0;
     setup.classList.add("hidden");
     transition.classList.remove("hidden");
@@ -130,9 +225,17 @@ function startGame(){
 }
 
 function showWord(){
+    clickSound.play();
     transition.classList.add("hidden");
     reveal.classList.remove("hidden");
-    document.getElementById("wordText").innerText=players[currentPlayer].word;
+
+    let player=players[currentPlayer];
+
+    if(player.role==="Idiot du Royaume"){
+        wordText.innerText="🤡 Tu n'as aucun mot.";
+    } else {
+        wordText.innerText=player.word;
+    }
 }
 
 function nextPlayer(){
@@ -162,21 +265,44 @@ function startVote(){
 }
 
 function eliminate(player){
+    clickSound.play();
     player.alive=false;
     voteScreen.classList.add("hidden");
+    resultScreen.classList.remove("hidden");
+    resultScreen.innerHTML="";
+
+    let title=document.createElement("h3");
+    title.innerText=player.name+" était "+player.role;
+    resultScreen.appendChild(title);
+
+    if(player.role==="Idiot du Royaume"){
+        let guess=prompt("Quel est le mot des villageois ?");
+        if(guess && guess.toLowerCase()===villageWord.toLowerCase()){
+            winSound.play();
+            resultScreen.innerHTML+="<h2>🤡 L'Idiot gagne !</h2>";
+            resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+            return;
+        }
+    }
+
     let impostorsAlive=players.filter(p=>p.role==="Imposteur"&&p.alive).length;
     let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
-    resultScreen.classList.remove("hidden");
-    resultScreen.innerHTML=`<h3>${player.name} était ${player.role}</h3>`;
+
     if(impostorsAlive===0){
-        resultScreen.innerHTML+=`<h2>🎉 Victoire des villageois</h2><button onclick="location.reload()">Nouvelle partie</button>`;
+        winSound.play();
+        resultScreen.innerHTML+="<h2>🎉 Victoire des villageois</h2>";
+        resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
         return;
     }
+
     if(impostorsAlive>=villagersAlive){
-        resultScreen.innerHTML+=`<h2>💀 Victoire des imposteurs</h2><button onclick="location.reload()">Nouvelle partie</button>`;
+        winSound.play();
+        resultScreen.innerHTML+="<h2>💀 Victoire des imposteurs</h2>";
+        resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
         return;
     }
-    resultScreen.innerHTML+=`<button onclick="nextRound()">Continuer</button>`;
+
+    resultScreen.innerHTML+="<button onclick='nextRound()'>Continuer</button>";
 }
 
 function nextRound(){
@@ -187,6 +313,11 @@ function nextRound(){
 function toggleRules(){
     rules.classList.toggle("hidden");
 }
+
+function resetSettings(){
+    location.reload();
+}
+
 </script>
 </body>
 </html>
