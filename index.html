@@ -66,9 +66,7 @@ button:hover{background:linear-gradient(145deg,#d4af37,#a67c00);}
 👨‍🌾 <b>Villageois</b> : Ont le même mot.<br><br>
 🕵️ <b>Renégats</b> : Ont un mot différent.<br><br>
 🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.<br><br>
-⚖️ Minimum 3 joueurs.<br>
-Renégats et Idiots peuvent être 0.<br>
-Mais pas les deux à 0.
+⚖️ <b>Conditions</b> Il y a minimum 3 joueurs, aucun minimum pour les renégats et les idiots du royaume, cependant la partie ne se lance pas s'il n'y a pas de renégat ni d'idiot du royaume. 
 </p>
 </div>
 
@@ -99,17 +97,18 @@ let villageWord="";
 let impostorWord="";
 
 const words=[
-["Chat","Tigre"],["Lion","Panthère"],["Chien","Loup"],
-["Pizza","Burger"],["Pâtes","Riz"],["Frites","Chips"],
-["Voiture","Moto"],["Avion","Hélicoptère"],
-["Mer","Piscine"],["Montagne","Colline"],
-["Ordinateur","Tablette"],["Téléphone","Radio"],
-["Film","Série"],["Livre","Magazine"],
-["Café","Thé"],["Chocolat","Bonbon"],
-["Bateau","Sous-marin"],["Neige","Glace"],
-["Pomme","Poire"],["Soleil","Lune"],
-["Football","Basket"],["Paris","Londres"],
-["Dragon","Dinosaure"],["Clown","Magicien"]
+["Chat","Tigre"],["Lion","Panthère"],["Chien","Loup"], ["Pizza","Burger"],["Pâtes","Riz"],["Frites","Chips"], ["Voiture","Moto"],["Locomotive","Wagon"],["Avion","Hélicoptère"], ["Mer","Piscine"],["Montagne","Colline"],
+  ["Forêt","Jungle"], ["Ordinateur","Tablette"],["Téléphone","Radio"],["Caméra","Appareil photo"], ["Film","Série"],["Livre","Magazine"],["Hôpital","Vétérinaire"],["Café","Thé"], ["Chocolat","Bonbon"],
+  ["Bateau","Sous-marin"],["Neige","Glace"],["Pomme","Poire"], ["Fraise","Framboise"],["Chaussure","Botte"],["Chemise","Veste"], ["Soleil","Lune"],["Mer","Océan"],["Police","Pompier"], ["Roi","Prince"],
+  ["Supermarché","Boulangerie"], ["Football","Basket"],["Paris","Londres"], ["Netflix","YouTube"],["Amazon","eBay"], ["Facebook","Instagram"],["Snapchat","TikTok"], ["McDonald's","Burger King"],
+  ["Pepsi","Coca-Cola"], ["Ferrari","Lamborghini"],["Nike","Adidas"], ["Marvel","DC"],["Bitcoin","Ethereum"], ["Samsung","Apple"], ["Xbox","PlayStation"],["Windows","Mac"], ["Google","FireFox"],
+  ["Airbnb","Hotel"], ["Uber","Taxi"],["Croissant","Pain au chocolat"], ["Fromage","Beurre"],["Bière","Vin"], ["Guitare","Piano"],["Drame","Comédie"], ["Action","Horreur"],["Zombie","Vampire"], 
+  ["Dragon","Dinosaure"], ["Clown","Magicien"], ["Pluie","Orage"],["Désert","Savane"], ["Cinéma","Théâtre"],["PlayMobil","LEGO"],["Mario","Link"],["Zelda","Ganondorph"],["Feutre","Peinture"],["Croquis","Dessin"],
+  ["Château", "Forteresse"],
+        ["Dragon", "Serpent"],
+        ["Épée", "Dague"],
+        ["Couronne", "Diadème"],
+        ["Chevalier", "Soldat"]
 ];
 
 function saveConfig(){
@@ -240,13 +239,16 @@ playerName.innerText=players[currentPlayer].name;
 function showWord(){
 transition.classList.add("hidden");
 reveal.classList.remove("hidden");
+
 let player=players[currentPlayer];
+
 if(player.role==="Idiot du Royaume"){
-wordText.innerText="🤡 Tu es l'Idiot du Royaume";
+wordText.innerText = player.name + ", tu es l'Idiot du Royaume 🤡";
 }else{
-wordText.innerText=player.word;
+wordText.innerText = player.name + ", ton mot est : " + player.word;
 }
 }
+
 
 function nextPlayer(){
 currentPlayer++;
@@ -283,7 +285,7 @@ resultScreen.innerHTML="<h3>"+player.name+" était "+player.role+"</h3>";
 if(player.role==="Idiot du Royaume"){
 let guess=prompt("Quel est le mot des villageois ?");
 if(guess && guess.toLowerCase()===villageWord.toLowerCase()){
-resultScreen.innerHTML+="<h2>🤡 L'Idiot triomphe !</h2>";
+resultScreen.innerHTML+="<h2>🤡 L'Idiot triomphe ! 🤡</h2>";
 resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
 return;
 }
