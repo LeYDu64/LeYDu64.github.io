@@ -1,10 +1,127 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Mon site</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>L'Imposteur du Village</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: #222;
+    color: white;
+    padding: 20px;
+}
+
+button {
+    padding: 15px;
+    font-size: 18px;
+    margin: 10px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
+
+.card {
+    background: #333;
+    padding: 30px;
+    border-radius: 15px;
+    margin-top: 20px;
+}
+</style>
 </head>
+
 <body>
-  <h1>Bienvenue sur mon site 🎉</h1>
-  <p>Ceci est mon premier site web avec GitHub Pages !</p>
+
+<h1>🎭 L'Imposteur du Village</h1>
+
+<div id="setup">
+    <p>Nombre de joueurs :</p>
+    <input type="number" id="playerCount" min="4" value="4">
+    <br>
+    <button onclick="startGame()">Commencer</button>
+</div>
+
+<div id="reveal" class="hidden">
+    <div class="card">
+        <h2 id="roleText"></h2>
+        <h3 id="wordText"></h3>
+        <button onclick="nextPlayer()">Joueur suivant</button>
+    </div>
+</div>
+
+<script>
+
+let players = [];
+let currentPlayer = 0;
+
+let words = [
+    ["Chat", "Tigre"],
+    ["Pizza", "Burger"],
+    ["Voiture", "Moto"],
+    ["Plage", "Piscine"]
+];
+
+function startGame() {
+    let count = parseInt(document.getElementById("playerCount").value);
+    players = [];
+
+    let randomPair = words[Math.floor(Math.random() * words.length)];
+    let villageWord = randomPair[0];
+    let impostorWord = randomPair[1];
+
+    let impostorCount = Math.floor(count / 4); // 1 imposteur tous les 4 joueurs
+
+    for (let i = 0; i < count; i++) {
+        players.push({
+            role: "Villageois",
+            word: villageWord
+        });
+    }
+
+    // Mélanger les joueurs
+    players.sort(() => Math.random() - 0.5);
+
+    // Assigner imposteurs
+    for (let i = 0; i < impostorCount; i++) {
+        players[i].role = "Imposteur";
+        players[i].word = impostorWord;
+    }
+
+    currentPlayer = 0;
+
+    document.getElementById("setup").classList.add("hidden");
+    document.getElementById("reveal").classList.remove("hidden");
+
+    showRole();
+}
+
+function showRole() {
+    let player = players[currentPlayer];
+
+    document.getElementById("roleText").innerText =
+        "Joueur " + (currentPlayer + 1) + " : " + player.role;
+
+    document.getElementById("wordText").innerText =
+        player.role === "Idiot du village" ? "Tu n'as aucun mot !" : player.word;
+}
+
+function nextPlayer() {
+    currentPlayer++;
+    if (currentPlayer >= players.length) {
+        document.getElementById("reveal").innerHTML =
+            "<h2>🎉 Tous les rôles ont été distribués !</h2>";
+        return;
+    }
+    showRole();
+}
+
+</script>
+
 </body>
 </html>
