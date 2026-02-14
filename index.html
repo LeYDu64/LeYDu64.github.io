@@ -1,1 +1,322 @@
-<!DOCTYPE html> <html lang="fr"> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <meta name="theme-color" content="#1a120b"> <title>Le Renégat du Royaume</title> <style> .idiotContainer{ display:flex; justify-content:center; margin-top:8px; } .idiotLabel{ display:flex; align-items:center; gap:8px; font-size:15px; cursor:pointer; } input[type="checkbox"]{ width:18px; height:18px; accent-color: gold; } body{ margin:0; font-family: 'Georgia', serif; color:#f5deb3; text-align:center; background: radial-gradient(circle at top,#3b2a1d,#1a120b 60%); } .container{ max-width:520px; margin:auto; padding:20px; } .logo{ font-size:32px; font-weight:bold; color:gold; text-shadow:0 0 10px gold,0 0 20px #ffae00; } .card{ background:linear-gradient(145deg,#2b1d13,#1a120b); padding:20px; margin-top:20px; border-radius:18px; box-shadow:0 0 25px rgba(255,215,0,0.2); border:1px solid rgba(255,215,0,0.2); animation:fadeIn 0.5s ease; } @keyframes fadeIn{ from{opacity:0;transform:translateY(15px);} to{opacity:1;transform:translateY(0);} } input{ padding:10px; margin:6px; border-radius:8px; border:1px solid #b8860b; background:#1a120b; color:#f5deb3; } button{ background:linear-gradient(145deg,#b8860b,#8b6508); border:none; padding:12px; margin:8px 0; width:100%; font-size:16px; border-radius:10px; color:white; cursor:pointer; font-weight:bold; box-shadow:0 0 10px rgba(255,215,0,0.4); } button:hover{ background:linear-gradient(145deg,#d4af37,#a67c00); } .playerButton{ background:linear-gradient(145deg,#5a3e2b,#3b2a1d); } .ruleBtn{background:#3e6b48;} .resetBtn{background:#6b2c2c;} .hidden{display:none;} </style> </head> <body> <div class="container"> <div class="logo">👑 Le Renégat du Royaume</div> <div id="setup" class="card"> <h3>⚔ Configuration</h3> <input type="number" id="playerCount" min="4" placeholder="Nombre de joueurs"> <input type="number" id="impostorCount" min="1" placeholder="Nombre de Renégat"> <div class="idiotContainer"> <label class="idiotLabel"> <input type="checkbox" id="idiotToggle"> 🤡 Ajouter un Idiot au Royaume 🤡 </label> </div> <div id="nameInputs"></div> <button onclick="generateNameInputs()">Valider joueurs</button> <button onclick="startGame()">Lancer la partie</button> <button class="ruleBtn" onclick="toggleRules()">Règles</button> <button class="resetBtn" onclick="resetData()">Réinitialiser</button> </div> <div id="rules" class="card hidden"> <h3>📜 Rôles</h3> <p> 👨‍🌾 <b>Villageois</b> : Ont le même mot.<br><br> 🕵️ <b>Renégats</b> : Ont un mot différent des villageois.<br><br> 🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.<br><br> ⚖️ <b>Condition</b> : Minimum 4 joueurs, minimum 1 imposteur, maximum 1 idiot. </p> </div> <div id="transition" class="card hidden"> <h3>Passe le téléphone à</h3> <h2 id="playerName"></h2> <button onclick="showWord()">Voir mon rôle</button> </div> <div id="reveal" class="card hidden"> <h2 id="wordText"></h2> <button onclick="nextPlayer()">Cacher</button> </div> <div id="voteScreen" class="card hidden"> <h3>Votez un joueur</h3> <div id="voteButtons"></div> </div> <div id="resultScreen" class="card hidden"></div> </div> <script> let players=[]; let currentPlayer=0; let villageWord=""; let impostorWord=""; const words=[ ["Chat","Tigre"],["Lion","Panthère"],["Chien","Loup"], ["Pizza","Burger"],["Pâtes","Riz"],["Frites","Chips"], ["Voiture","Moto"],["Locomotive","Wagon"],["Avion","Hélicoptère"], ["Mer","Piscine"],["Montagne","Colline"], ["Forêt","Jungle"], ["Ordinateur","Tablette"],["Téléphone","Radio"],["Caméra","Appareil photo"], ["Film","Série"],["Livre","Magazine"],["Hôpital","Vétérinaire"],["Café","Thé"], ["Chocolat","Bonbon"], ["Bateau","Sous-marin"],["Neige","Glace"],["Pomme","Poire"], ["Fraise","Framboise"],["Chaussure","Botte"],["Chemise","Veste"], ["Soleil","Lune"],["Mer","Océan"],["Police","Pompier"], ["Roi","Prince"],["Supermarché","Boulangerie"], ["Football","Basket"],["Paris","Londres"], ["Netflix","YouTube"],["Amazon","eBay"], ["Facebook","Instagram"],["Snapchat","TikTok"], ["McDonald's","Burger King"], ["Pepsi","Coca-Cola"], ["Ferrari","Lamborghini"],["Nike","Adidas"], ["Marvel","DC"],["Bitcoin","Ethereum"], ["Samsung","Apple"], ["Xbox","PlayStation"],["Windows","Mac"], ["Google","FireFox"], ["Airbnb","Hotel"], ["Uber","Taxi"],["Croissant","Pain au chocolat"], ["Fromage","Beurre"],["Bière","Vin"], ["Guitare","Piano"],["Drame","Comédie"], ["Action","Horreur"],["Zombie","Vampire"], ["Dragon","Dinosaure"], ["Clown","Magicien"], ["Pluie","Orage"],["Désert","Savane"], ["Cinéma","Théâtre"],["PlayMobil","LEGO"],["Mario","Link"],["Zelda","Ganondorph"],["Feutre","Peinture"],["Croquis","Dessin"], ]; /* =============================== SAUVEGARDE CONFIGURATION ================================= */ function saveConfig(){ const config={ playerCount:playerCount.value, impostorCount:impostorCount.value, idiot:idiotToggle.checked, names:getNames() }; localStorage.setItem("royaumeConfig",JSON.stringify(config)); } function loadConfig(){ const saved=JSON.parse(localStorage.getItem("royaumeConfig")); if(!saved) return; playerCount.value=saved.playerCount; impostorCount.value=saved.impostorCount; idiotToggle.checked=saved.idiot; generateNameInputs(); setTimeout(()=>{ saved.names.forEach((name,i)=>{ const input=document.getElementById("name"+i); if(input) input.value=name; }); },100); } function resetData(){ localStorage.removeItem("royaumeConfig"); location.reload(); } /* =============================== LOGIQUE JEU ================================= */ function shuffle(array){ for(let i=array.length-1;i>0;i--){ let j=Math.floor(Math.random()*(i+1)); [array[i],array[j]]=[array[j],array[i]]; } } function getNames(){ let names=[]; for(let i=0;i<playerCount.value;i++){ names.push(document.getElementById("name"+i)?.value||("Joueur "+(i+1))); } return names; } function generateNameInputs(){ let count=parseInt(playerCount.value); let container=document.getElementById("nameInputs"); container.innerHTML=""; for(let i=0;i<count;i++){ let input=document.createElement("input"); input.id="name"+i; input.placeholder="Nom joueur "+(i+1); container.appendChild(input); } saveConfig(); } function startGame(){ saveConfig(); let count=parseInt(playerCount.value); let impostors=parseInt(impostorCount.value); let idiot=idiotToggle.checked; if(count<4||impostors<1||impostors>=count){ alert("Configuration invalide"); return; } players=[]; let pair=words[Math.floor(Math.random()*words.length)]; villageWord=pair[0]; impostorWord=pair[1]; let names=getNames(); for(let i=0;i<count;i++){ players.push({ name:names[i], role:"Villageois", word:villageWord, alive:true }); } shuffle(players); for(let i=0;i<impostors;i++){ players[i].role="Renégat"; players[i].word=impostorWord; } if(idiot){ let villagers=players.filter(p=>p.role==="Villageois"); let chosen=villagers[Math.floor(Math.random()*villagers.length)]; chosen.role="Idiot du Royaume"; chosen.word=""; } shuffle(players); currentPlayer=0; setup.classList.add("hidden"); transition.classList.remove("hidden"); playerName.innerText=players[currentPlayer].name; } function showWord(){ transition.classList.add("hidden"); reveal.classList.remove("hidden"); let player=players[currentPlayer]; if(player.role==="Idiot du Royaume"){ wordText.innerText="🤡 Tu es l'idiot du royaume 🤡"; } else { wordText.innerText=player.word; } } function nextPlayer(){ currentPlayer++; if(currentPlayer>=players.length){ reveal.classList.add("hidden"); startVote(); return; } reveal.classList.add("hidden"); transition.classList.remove("hidden"); playerName.innerText=players[currentPlayer].name; } function startVote(){ voteScreen.classList.remove("hidden"); voteButtons.innerHTML=""; players.forEach(p=>{ if(p.alive){ let btn=document.createElement("button"); btn.className="playerButton"; btn.innerText=p.name; btn.onclick=()=>eliminate(p); voteButtons.appendChild(btn); } }); } function eliminate(player){ player.alive=false; voteScreen.classList.add("hidden"); resultScreen.classList.remove("hidden"); resultScreen.innerHTML="<h3>"+player.name+" était "+player.role+"</h3>"; if(player.role==="Idiot du Royaume"){ let guess=prompt("Quel est le mot des villageois ?"); if(guess && guess.toLowerCase()===villageWord.toLowerCase()){ resultScreen.innerHTML+="<h2>🤡 L'Idiot triomphe !</h2>"; resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>"; return; } } let impostorsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length; let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length; if(impostorsAlive===0){ resultScreen.innerHTML+="<h2>🎉 Victoire des Villageois</h2>"; resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>"; return; } if(impostorsAlive>=villagersAlive){ resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>"; resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>"; return; } resultScreen.innerHTML+="<button onclick='nextRound()'>Continuer</button>"; } function nextRound(){ resultScreen.classList.add("hidden"); startVote(); } function toggleRules(){ rules.classList.toggle("hidden"); } loadConfig(); </script> </body> </html>
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a120b">
+<title>👑 Le Renégat du Royaume</title>
+
+<style>
+body{
+margin:0;
+font-family:'Georgia',serif;
+color:#f5deb3;
+text-align:center;
+background:radial-gradient(circle at top,#3b2a1d,#1a120b 60%);
+}
+.container{max-width:520px;margin:auto;padding:20px;}
+.logo{font-size:32px;font-weight:bold;color:gold;text-shadow:0 0 10px gold;}
+.card{
+background:linear-gradient(145deg,#2b1d13,#1a120b);
+padding:20px;margin-top:20px;border-radius:18px;
+box-shadow:0 0 25px rgba(255,215,0,0.2);
+border:1px solid rgba(255,215,0,0.2);
+}
+input{
+padding:10px;margin:6px;border-radius:8px;
+border:1px solid #b8860b;background:#1a120b;color:#f5deb3;
+}
+button{
+background:linear-gradient(145deg,#b8860b,#8b6508);
+border:none;padding:12px;margin:8px 0;width:100%;
+font-size:16px;border-radius:10px;color:white;
+cursor:pointer;font-weight:bold;
+}
+button:hover{background:linear-gradient(145deg,#d4af37,#a67c00);}
+.playerButton{background:linear-gradient(145deg,#5a3e2b,#3b2a1d);}
+.ruleBtn{background:#3e6b48;}
+.resetBtn{background:#6b2c2c;}
+.hidden{display:none;}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="logo">👑 Le Renégat du Royaume</div>
+
+<div id="setup" class="card">
+<h3>⚔ Configuration</h3>
+
+<input type="number" id="playerCount" min="3" placeholder="Nombre de joueurs (min 3)">
+<input type="number" id="impostorCount" min="0" placeholder="Nombre de Renégats">
+<input type="number" id="idiotCount" min="0" placeholder="Nombre d'Idiots du Royaume">
+
+<div id="nameInputs"></div>
+
+<button onclick="generateNameInputs()">Valider joueurs</button>
+<button onclick="startGame()">Lancer la partie</button>
+<button class="ruleBtn" onclick="toggleRules()">Règles</button>
+<button class="resetBtn" onclick="resetData()">Réinitialiser</button>
+</div>
+
+<div id="rules" class="card hidden">
+<h3>📜 Rôles</h3>
+<p>
+👨‍🌾 <b>Villageois</b> : Ont le même mot.<br><br>
+🕵️ <b>Renégats</b> : Ont un mot différent.<br><br>
+🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.<br><br>
+⚖️ Minimum 3 joueurs.<br>
+Renégats et Idiots peuvent être 0.<br>
+Mais pas les deux à 0.
+</p>
+</div>
+
+<div id="transition" class="card hidden">
+<h3>Passe le téléphone à</h3>
+<h2 id="playerName"></h2>
+<button onclick="showWord()">Voir mon rôle</button>
+</div>
+
+<div id="reveal" class="card hidden">
+<h2 id="wordText"></h2>
+<button onclick="nextPlayer()">Cacher</button>
+</div>
+
+<div id="voteScreen" class="card hidden">
+<h3>Votez un joueur</h3>
+<div id="voteButtons"></div>
+</div>
+
+<div id="resultScreen" class="card hidden"></div>
+
+</div>
+
+<script>
+let players=[];
+let currentPlayer=0;
+let villageWord="";
+let impostorWord="";
+
+const words=[
+["Chat","Tigre"],["Lion","Panthère"],["Chien","Loup"],
+["Pizza","Burger"],["Pâtes","Riz"],["Frites","Chips"],
+["Voiture","Moto"],["Avion","Hélicoptère"],
+["Mer","Piscine"],["Montagne","Colline"],
+["Ordinateur","Tablette"],["Téléphone","Radio"],
+["Film","Série"],["Livre","Magazine"],
+["Café","Thé"],["Chocolat","Bonbon"],
+["Bateau","Sous-marin"],["Neige","Glace"],
+["Pomme","Poire"],["Soleil","Lune"],
+["Football","Basket"],["Paris","Londres"],
+["Dragon","Dinosaure"],["Clown","Magicien"]
+];
+
+function saveConfig(){
+const config={
+playerCount:playerCount.value,
+impostorCount:impostorCount.value,
+idiotCount:idiotCount.value,
+names:getNames()
+};
+localStorage.setItem("royaumeConfig",JSON.stringify(config));
+}
+
+function loadConfig(){
+const saved=JSON.parse(localStorage.getItem("royaumeConfig"));
+if(!saved) return;
+playerCount.value=saved.playerCount;
+impostorCount.value=saved.impostorCount;
+idiotCount.value=saved.idiotCount||0;
+generateNameInputs();
+setTimeout(()=>{
+saved.names.forEach((name,i)=>{
+let input=document.getElementById("name"+i);
+if(input) input.value=name;
+});
+},100);
+}
+
+function resetData(){
+localStorage.removeItem("royaumeConfig");
+location.reload();
+}
+
+function shuffle(array){
+for(let i=array.length-1;i>0;i--){
+let j=Math.floor(Math.random()*(i+1));
+[array[i],array[j]]=[array[j],array[i]];
+}
+}
+
+function getNames(){
+let names=[];
+for(let i=0;i<playerCount.value;i++){
+names.push(document.getElementById("name"+i)?.value||("Joueur "+(i+1)));
+}
+return names;
+}
+
+function generateNameInputs(){
+let count=parseInt(playerCount.value)||0;
+let container=document.getElementById("nameInputs");
+container.innerHTML="";
+for(let i=0;i<count;i++){
+let input=document.createElement("input");
+input.id="name"+i;
+input.placeholder="Nom joueur "+(i+1);
+container.appendChild(input);
+}
+saveConfig();
+}
+
+function startGame(){
+
+saveConfig();
+
+let count=parseInt(playerCount.value)||0;
+let impostors=parseInt(impostorCount.value)||0;
+let idiotCountValue=parseInt(idiotCount.value)||0;
+
+if(count<3){
+alert("Minimum 3 joueurs.");
+return;
+}
+
+if(impostors<0||idiotCountValue<0){
+alert("Valeur invalide.");
+return;
+}
+
+if(impostors+idiotCountValue>=count){
+alert("Trop de rôles spéciaux.");
+return;
+}
+
+if(impostors===0 && idiotCountValue===0){
+alert("Il faut au moins un Renégat ou un Idiot du Royaume.");
+return;
+}
+
+players=[];
+
+let pair=words[Math.floor(Math.random()*words.length)];
+villageWord=pair[0];
+impostorWord=pair[1];
+
+let names=getNames();
+
+for(let i=0;i<count;i++){
+players.push({
+name:names[i],
+role:"Villageois",
+word:villageWord,
+alive:true
+});
+}
+
+shuffle(players);
+
+for(let i=0;i<impostors;i++){
+players[i].role="Renégat";
+players[i].word=impostorWord;
+}
+
+let index=impostors;
+for(let i=0;i<idiotCountValue;i++){
+players[index].role="Idiot du Royaume";
+players[index].word="";
+index++;
+}
+
+shuffle(players);
+
+currentPlayer=0;
+setup.classList.add("hidden");
+transition.classList.remove("hidden");
+playerName.innerText=players[currentPlayer].name;
+}
+
+function showWord(){
+transition.classList.add("hidden");
+reveal.classList.remove("hidden");
+let player=players[currentPlayer];
+if(player.role==="Idiot du Royaume"){
+wordText.innerText="🤡 Tu es l'Idiot du Royaume";
+}else{
+wordText.innerText=player.word;
+}
+}
+
+function nextPlayer(){
+currentPlayer++;
+if(currentPlayer>=players.length){
+reveal.classList.add("hidden");
+startVote();
+return;
+}
+reveal.classList.add("hidden");
+transition.classList.remove("hidden");
+playerName.innerText=players[currentPlayer].name;
+}
+
+function startVote(){
+voteScreen.classList.remove("hidden");
+voteButtons.innerHTML="";
+players.forEach(p=>{
+if(p.alive){
+let btn=document.createElement("button");
+btn.className="playerButton";
+btn.innerText=p.name;
+btn.onclick=()=>eliminate(p);
+voteButtons.appendChild(btn);
+}
+});
+}
+
+function eliminate(player){
+player.alive=false;
+voteScreen.classList.add("hidden");
+resultScreen.classList.remove("hidden");
+resultScreen.innerHTML="<h3>"+player.name+" était "+player.role+"</h3>";
+
+if(player.role==="Idiot du Royaume"){
+let guess=prompt("Quel est le mot des villageois ?");
+if(guess && guess.toLowerCase()===villageWord.toLowerCase()){
+resultScreen.innerHTML+="<h2>🤡 L'Idiot triomphe !</h2>";
+resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+return;
+}
+}
+
+let impostorsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length;
+let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
+
+if(impostorsAlive===0){
+resultScreen.innerHTML+="<h2>🎉 Victoire des Villageois</h2>";
+resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+return;
+}
+
+if(impostorsAlive>=villagersAlive){
+resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>";
+resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+return;
+}
+
+resultScreen.innerHTML+="<button onclick='nextRound()'>Continuer</button>";
+}
+
+function nextRound(){
+resultScreen.classList.add("hidden");
+startVote();
+}
+
+function toggleRules(){
+rules.classList.toggle("hidden");
+}
+
+loadConfig();
+</script>
+</body>
+</html>
