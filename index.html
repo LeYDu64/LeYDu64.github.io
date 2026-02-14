@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a120b">
-<title>L'Imposteur du Royaume</title>
+<title>Le Renégat du Royaume</title>
 
 <style>
 
@@ -105,16 +105,16 @@ button:hover{
 <body>
 
 <div class="container">
-<div class="logo">👑 L'Imposteur du Royaume</div>
+<div class="logo">👑 Le Renégat du Royaume</div>
 
 <div id="setup" class="card">
 <h3>⚔ Configuration</h3>
 <input type="number" id="playerCount" min="4" placeholder="Nombre de joueurs">
-<input type="number" id="impostorCount" min="1" placeholder="Nombre d'imposteurs">
+<input type="number" id="impostorCount" min="1" placeholder="Nombre de Renégat">
 <div class="idiotContainer">
     <label class="idiotLabel">
         <input type="checkbox" id="idiotToggle">
-        🤡 Ajouter un Idiot du Royaume
+        🤡 Ajouter un Idiot au Royaume 🤡
     </label>
 </div>
 <div id="nameInputs"></div>
@@ -128,7 +128,7 @@ button:hover{
 <h3>📜 Rôles</h3>
 <p>
 👨‍🌾 <b>Villageois</b> : Ont le même mot.<br><br>
-🕵️ <b>Imposteur</b> : Ont un mot différent des villageois.<br><br>
+🕵️ <b>Renégats</b> : Ont un mot différent des villageois.<br><br>
 🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.<br><br>
 ⚖️ <b>Condition</b> : Minimum 4 joueurs, minimum 1 imposteur, maximum 1 idiot.    
 </p>
@@ -271,7 +271,7 @@ function startGame(){
     shuffle(players);
 
     for(let i=0;i<impostors;i++){
-        players[i].role="Imposteur";
+        players[i].role="Renégat";
         players[i].word=impostorWord;
     }
 
@@ -344,7 +344,7 @@ function eliminate(player){
         }
     }
 
-    let impostorsAlive=players.filter(p=>p.role==="Imposteur"&&p.alive).length;
+    let impostorsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length;
     let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
 
     if(impostorsAlive===0){
@@ -354,7 +354,7 @@ function eliminate(player){
     }
 
     if(impostorsAlive>=villagersAlive){
-        resultScreen.innerHTML+="<h2>💀 Victoire des Imposteurs</h2>";
+        resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>";
         resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
         return;
     }
