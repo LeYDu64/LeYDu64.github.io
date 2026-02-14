@@ -7,6 +7,27 @@
 <title>L'Imposteur du Royaume</title>
 
 <style>
+
+.idiotContainer{
+    display:flex;
+    justify-content:center;
+    margin-top:8px;
+}
+
+.idiotLabel{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-size:15px;
+    cursor:pointer;
+}
+
+input[type="checkbox"]{
+    width:18px;
+    height:18px;
+    accent-color: gold;
+}
+        
 body{
     margin:0;
     font-family: 'Georgia', serif;
@@ -90,7 +111,12 @@ button:hover{
 <h3>⚔ Configuration</h3>
 <input type="number" id="playerCount" min="4" placeholder="Nombre de joueurs">
 <input type="number" id="impostorCount" min="1" placeholder="Nombre d'imposteurs">
-<label><input type="checkbox" id="idiotToggle"> Ajouter un Idiot du Royaume</label>
+<div class="idiotContainer">
+    <label class="idiotLabel">
+        <input type="checkbox" id="idiotToggle">
+        🤡 Ajouter un Idiot du Royaume
+    </label>
+</div>
 <div id="nameInputs"></div>
 <button onclick="generateNameInputs()">Valider joueurs</button>
 <button onclick="startGame()">Lancer la partie</button>
@@ -103,7 +129,7 @@ button:hover{
 <p>
 👨‍🌾 <b>Villageois</b> : Ont le même mot.<br><br>
 🕵️ <b>Imposteur</b> : Ont un mot différent des villageois.<br><br>
-🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.
+🤡 <b>Idiot du Royaume</b> : N'a aucun mot et tente de deviner le mot des villageois à son élimination.<br><br>
 ⚖️ <b>Condition</b> : Minimum 4 joueurs, minimum 1 imposteur, maximum 1 idiot.    
 </p>
 </div>
