@@ -110,13 +110,9 @@ button:hover{
 <div id="setup" class="card">
 <h3>⚔ Configuration</h3>
 <input type="number" id="playerCount" min="4" placeholder="Nombre de joueurs">
-<input type="number" id="impostorCount" min="1" placeholder="Nombre de Renégat">
-<div class="idiotContainer">
-    <label class="idiotLabel">
-        <input type="checkbox" id="idiotToggle">
-        🤡 Ajouter un Idiot au Royaume 🤡
-    </label>
-</div>
+<input type="number" id="impostorCount" min="0" placeholder="Nombre de Renégats">
+<input type="number" id="idiotCount" min="0" placeholder="Nombre d'Idiots du Royaume">
+
 <div id="nameInputs"></div>
 <button onclick="generateNameInputs()">Valider joueurs</button>
 <button onclick="startGame()">Lancer la partie</button>
@@ -179,7 +175,7 @@ function saveConfig(){
     const config={
         playerCount:playerCount.value,
         impostorCount:impostorCount.value,
-        idiot:idiotToggle.checked,
+        idiotCount:idiotCount.value,
         names:getNames()
     };
     localStorage.setItem("royaumeConfig",JSON.stringify(config));
@@ -191,7 +187,8 @@ function loadConfig(){
 
     playerCount.value=saved.playerCount;
     impostorCount.value=saved.impostorCount;
-    idiotToggle.checked=saved.idiot;
+    idiotCount.value=saved.idiotCount || 0;
+
 
     generateNameInputs();
 
@@ -241,13 +238,19 @@ function generateNameInputs(){
 }
 
 function startGame(){
+    if(impostors===0 && idiotCountValue===0){
+    alert("Il faut au moins un Renégat ou un Idiot du Royaume.");
+    return;
+}
+
     saveConfig();
 
     let count=parseInt(playerCount.value);
     let impostors=parseInt(impostorCount.value);
-    let idiot=idiotToggle.checked;
+    let idiotCountValue=parseInt(idiotCount.value)||0;
 
-    if(count<4||impostors<1||impostors>=count){
+
+   if(count<3 || impostors<0 || idiotCountValue<0 || (impostors+idiotCountValue)>=count){
         alert("Configuration invalide");
         return;
     }
@@ -268,19 +271,22 @@ function startGame(){
         });
     }
 
-    shuffle(players);
+  shuffle(players);
 
-    for(let i=0;i<impostors;i++){
-        players[i].role="Renégat";
-        players[i].word=impostorWord;
-    }
+// Attribution Renégats
+for(let i=0;i<impostors;i++){
+    players[i].role="Renégat";
+    players[i].word=impostorWord;
+}
 
-    if(idiot){
-        let villagers=players.filter(p=>p.role==="Villageois");
-        let chosen=villagers[Math.floor(Math.random()*villagers.length)];
-        chosen.role="Idiot du Royaume";
-        chosen.word="";
-    }
+// Attribution Idiots
+let assigned=impostors;
+for(let i=0;i<idiotCountValue;i++){
+    players[assigned].role="Idiot du Royaume";
+    players[assigned].word="";
+    assigned++;
+}
+
 
     shuffle(players);
 
@@ -344,20 +350,29 @@ function eliminate(player){
         }
     }
 
-    let impostorsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length;
-    let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
+    let renegatsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length;
+let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
+let idiotsAlive=players.filter(p=>p.role==="Idiot du Royaume"&&p.alive).length;
 
-    if(impostorsAlive===0){
-        resultScreen.innerHTML+="<h2>🎉 Victoire des Villageois</h2>";
-        resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
-        return;
-    }
+// Cas sans Renégat
+if(renegatsAlive===0 && impostorCount.value==0){
+    resultScreen.innerHTML+="<h2>🎉 Les Villageois survivent !</h2>";
+    resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
+}
 
-    if(impostorsAlive>=villagersAlive){
-        resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>";
-        resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
-        return;
-    }
+if(renegatsAlive===0){
+    resultScreen.innerHTML+="<h2>🎉 Victoire des Villageois</h2>";
+    resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
+}
+
+if(renegatsAlive>=villagersAlive){
+    resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>";
+    resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
+}
+
 
     resultScreen.innerHTML+="<button onclick='nextRound()'>Continuer</button>";
 }
