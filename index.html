@@ -5,6 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#1a120b">
 <title>👑 Le Renégat du Royaume</title>
+<div id="onlineMode" class="card">
+  <h3>🌐 Mode En Ligne</h3>
+
+  <!-- Créer une partie -->
+  <input type="text" id="playerNameCreate" placeholder="Ton pseudo">
+  <button onclick="createRoom(document.getElementById('playerNameCreate').value)">
+    Créer une partie
+  </button>
+
+  <hr>
+
+  <!-- Rejoindre une partie -->
+  <input type="text" id="roomCode" placeholder="Code de la partie">
+  <input type="text" id="playerNameJoin" placeholder="Ton pseudo">
+  <button onclick="joinRoom(
+      document.getElementById('roomCode').value,
+      document.getElementById('playerNameJoin').value
+    )">
+    Rejoindre une partie
+  </button>
+</div>
 
 <style>
 // ===== AUDIO =====
