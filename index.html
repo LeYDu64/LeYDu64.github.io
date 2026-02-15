@@ -7,6 +7,37 @@
 <title>👑 Le Renégat du Royaume</title>
 
 <style>
+/* ===== ANIMATIONS GENERALES ===== */
+
+.card {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.4s ease;
+}
+
+.card.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+button {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+@keyframes pop {
+    0% { transform: scale(0.7); opacity: 0; }
+    70% { transform: scale(1.05); opacity: 1; }
+    100% { transform: scale(1); }
+}
+
+.pop {
+    animation: pop 0.3s ease forwards;
+}
+
 /* === ANIMATIONS === */
 
 .fadeIn {
@@ -293,7 +324,7 @@ shuffle(players);
 
 currentPlayer=0;
 setup.classList.add("hidden");
-transition.classList.remove("hidden");
+showScreen("transition");
 playerName.innerText=players[currentPlayer].name;
 }
 
@@ -301,7 +332,7 @@ function showWord(){
 animate(document.getElementById("reveal"), "pop");
 transition.classList.add("hidden");
 reveal.classList.remove("hidden");
-
+popElement("wordText");
 let player=players[currentPlayer];
 
 if(player.role==="Idiot du Royaume"){
@@ -326,7 +357,7 @@ playerName.innerText=players[currentPlayer].name;
 
 function startVote(){
 animate(document.getElementById("voteScreen"), "slideUp");
-voteScreen.classList.remove("hidden");
+showScreen("voteScreen");
 voteButtons.innerHTML="";
 players.forEach(p=>{
 if(p.alive){
@@ -380,7 +411,32 @@ startVote();
 function toggleRules(){
 rules.classList.toggle("hidden");
 }
+// Animation automatique des écrans
+function showScreen(id) {
 
+    // cacher toutes les cartes
+    document.querySelectorAll(".card").forEach(card => {
+        card.classList.remove("show");
+        card.classList.add("hidden");
+    });
+
+    // afficher la bonne
+    let screen = document.getElementById(id);
+    screen.classList.remove("hidden");
+
+    // petit délai pour animation
+    setTimeout(() => {
+        screen.classList.add("show");
+    }, 50);
+}
+
+// Animation "pop"
+function popElement(id) {
+    let el = document.getElementById(id);
+    el.classList.remove("pop");
+    void el.offsetWidth;
+    el.classList.add("pop");
+}
 loadConfig();
 </script>
 </body>
