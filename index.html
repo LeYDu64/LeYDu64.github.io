@@ -6,6 +6,27 @@
 <meta name="theme-color" content="#1a120b">
 <title>👑 Le Renégat du Royaume</title>
 
+<style>
+// ===== AUDIO =====
+
+let music = new Audio("music.mp3");
+let revealSound = new Audio("reveal.mp3");
+let voteSound = new Audio("vote.mp3");
+let winSound = new Audio("win.mp3");
+
+music.loop = true;
+music.volume = 0.4;
+
+let soundEnabled = true;
+
+// Démarrer musique au premier clic (important mobile)
+document.addEventListener("click", function startMusic(){
+    if(soundEnabled){
+        music.play();
+    }
+    document.removeEventListener("click", startMusic);
+});
+
 /* === ANIMATIONS === */
 
 .fadeIn {
@@ -90,144 +111,13 @@ button:hover{background:linear-gradient(145deg,#d4af37,#a67c00);}
 .ruleBtn{background:#3e6b48;}
 .resetBtn{background:#6b2c2c;}
 .hidden{display:none;}
-
-#onlineMode input {
-    width: 100%;
-    margin: 6px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #b8860b;
-    background: #1a120b;
-    color: #f5deb3;
-}
-
-#onlineMode button {
-    background: linear-gradient(145deg,#b8860b,#8b6508);
-    border: none;
-    padding: 12px;
-    margin: 8px 0;
-    width: 100%;
-    font-size: 16px;
-    border-radius: 10px;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-#onlineMode button:hover {
-    background: linear-gradient(145deg,#d4af37,#a67c00);
-}
-<style>
-body {
-    margin:0;
-    font-family:'Georgia',serif;
-    color:#f5deb3;
-    text-align:center;
-    background:radial-gradient(circle at top,#3b2a1d,#1a120b 60%);
-}
-.container {
-    max-width:520px;
-    margin:auto;
-    padding:20px;
-}
-.logo {
-    font-size:32px;
-    font-weight:bold;
-    color:gold;
-    text-shadow:0 0 10px gold;
-}
-.card {
-    background:linear-gradient(145deg,#2b1d13,#1a120b);
-    padding:20px;
-    margin-top:20px;
-    border-radius:18px;
-    box-shadow:0 0 25px rgba(255,215,0,0.2);
-    border:1px solid rgba(255,215,0,0.2);
-}
-
-/* === Inputs et boutons uniformes pour local + en ligne === */
-#setup input,
-#onlineMode input {
-    width: 100%;
-    margin: 6px 0;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #b8860b;
-    background: #1a120b;
-    color: #f5deb3;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-#setup button,
-#onlineMode button {
-    width: 100%;
-    margin: 8px 0;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 10px;
-    font-weight: bold;
-    color: white;
-    border: none;
-    cursor: pointer;
-    background: linear-gradient(145deg,#b8860b,#8b6508);
-    box-sizing: border-box;
-}
-
-#setup button:hover,
-#onlineMode button:hover {
-    background: linear-gradient(145deg,#d4af37,#a67c00);
-}
 </style>
-
 </head>
 
 <body>
 <div class="container">
 
 <div class="logo">👑 Le Renégat du Royaume</div>
-<!-- ========================= -->
-<!-- MODE LOCAL -->
-<!-- ========================= -->
-<div id="setup" class="card">
-  <h3>⚔ Configuration Locale</h3>
-
-  <input type="number" id="playerCount" min="3" placeholder="Nombre de joueurs">
-  <input type="number" id="impostorCount" min="0" placeholder="Nombre de Renégats">
-  <input type="number" id="idiotCount" min="0" placeholder="Nombre d'Idiots du Royaume">
-
-  <div id="nameInputs"></div>
-
-  <button onclick="generateNameInputs()">Valider joueurs</button>
-  <button onclick="startGame()">Lancer la partie</button>
-  <button class="ruleBtn" onclick="toggleRules()">Règles</button>
-  <button class="resetBtn" onclick="resetData()">Réinitialiser</button>
-</div>
-
-<!-- ========================= -->
-<!-- MODE EN LIGNE -->
-<!-- ========================= -->
-<div id="onlineMode" class="card">
-  <h3>🌐 Mode En Ligne</h3>
-
-  <!-- Créer une partie -->
-  <input type="text" id="playerNameCreate" placeholder="Ton pseudo">
-  <button onclick="createRoom(document.getElementById('playerNameCreate').value)">
-    Créer une partie
-  </button>
-
-  <hr style="border:1px solid rgba(255,215,0,0.2); margin:12px 0;">
-
-  <!-- Rejoindre une partie -->
-  <input type="text" id="roomCode" placeholder="Code de la partie">
-  <input type="text" id="playerNameJoin" placeholder="Ton pseudo">
-  <button onclick="joinRoom(
-      document.getElementById('roomCode').value,
-      document.getElementById('playerNameJoin').value
-    )">
-    Rejoindre une partie
-  </button>
-</div>
 
 <div id="setup" class="card">
 <h3>⚔ Configuration</h3>
@@ -237,7 +127,6 @@ body {
 <input type="number" id="idiotCount" min="0" placeholder="Nbre d'Idiots du Royaume">
 
 <div id="nameInputs"></div>
-
 
 <button onclick="generateNameInputs()">Valider joueurs</button>
 <button onclick="startGame()">Lancer la partie</button>
