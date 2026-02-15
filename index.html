@@ -7,6 +7,60 @@
 <title>👑 Le Renégat du Royaume</title>
 
 <style>
+/* === ANIMATIONS === */
+
+.fadeIn {
+    animation: fadeIn 0.5s ease forwards;
+}
+
+.slideUp {
+    animation: slideUp 0.4s ease forwards;
+}
+
+.pop {
+    animation: pop 0.3s ease;
+}
+
+.shake {
+    animation: shake 0.4s;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pop {
+    0% { transform: scale(0.7); }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    20% { transform: translateX(-5px); }
+    40% { transform: translateX(5px); }
+    60% { transform: translateX(-5px); }
+    80% { transform: translateX(5px); }
+    100% { transform: translateX(0); }
+}
+
+/* Effet pression bouton */
+button:active {
+    transform: scale(0.95);
+}
+
 body{
 margin:0;
 font-family:'Georgia',serif;
@@ -91,6 +145,7 @@ button:hover{background:linear-gradient(145deg,#d4af37,#a67c00);}
 </div>
 
 <script>
+
 let players=[];
 let currentPlayer=0;
 let villageWord="";
@@ -110,6 +165,12 @@ const words=[
         ["Couronne", "Diadème"],
         ["Chevalier", "Soldat"]
 ];
+
+function animate(element, animation){
+    element.classList.remove(animation);
+    void element.offsetWidth;
+    element.classList.add(animation);
+}
 
 function saveConfig(){
 const config={
@@ -237,6 +298,7 @@ playerName.innerText=players[currentPlayer].name;
 }
 
 function showWord(){
+animate(document.getElementById("reveal"), "pop");
 transition.classList.add("hidden");
 reveal.classList.remove("hidden");
 
@@ -263,6 +325,7 @@ playerName.innerText=players[currentPlayer].name;
 }
 
 function startVote(){
+animate(document.getElementById("voteScreen"), "slideUp");
 voteScreen.classList.remove("hidden");
 voteButtons.innerHTML="";
 players.forEach(p=>{
