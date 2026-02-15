@@ -1,4 +1,4 @@
-<script>
+
 let players=[];
 let currentPlayer=0;
 let villageWord="";
@@ -227,4 +227,4 @@ rules.classList.toggle("hidden");
 }
 
 loadConfig();
-</script>
+
