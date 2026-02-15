@@ -7,6 +7,26 @@
 <title>👑 Le Renégat du Royaume</title>
 
 <style>
+// ===== AUDIO =====
+
+let music = new Audio("music.mp3");
+let revealSound = new Audio("reveal.mp3");
+let voteSound = new Audio("vote.mp3");
+let winSound = new Audio("win.mp3");
+
+music.loop = true;
+music.volume = 0.4;
+
+let soundEnabled = true;
+
+// Démarrer musique au premier clic (important mobile)
+document.addEventListener("click", function startMusic(){
+    if(soundEnabled){
+        music.play();
+    }
+    document.removeEventListener("click", startMusic);
+});
+
 /* === ANIMATIONS === */
 
 .fadeIn {
