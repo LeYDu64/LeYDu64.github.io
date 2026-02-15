@@ -48,21 +48,17 @@ function nextSpeaker() {
 
     currentSpeakerIndex++;
 
-    if (currentSpeakerIndex >= speakingOrder.length) {
-        startVote(); // Passe au vote après le dernier joueur
-        return;
-    }
-    if (currentSpeakerIndex >= speakingOrder.length) {
-    // Cacher le bloc de tour
+   if (currentSpeakerIndex >= speakingOrder.length) {
+    // Cacher le bloc "À [nom] de parler"
     let speakingZone = document.getElementById("speakingZone");
     if (speakingZone) {
-        speakingZone.classList.add("hidden");
+        speakingZone.classList.add("hidden"); // ou speakingZone.remove(); si tu veux supprimer complètement
     }
 
     startVote(); // Passe au vote après le dernier joueur
     return;
-
 }
+
 
     showCurrentSpeaker();
 }
