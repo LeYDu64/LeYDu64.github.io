@@ -52,6 +52,17 @@ function nextSpeaker() {
         startVote(); // Passe au vote après le dernier joueur
         return;
     }
+    if (currentSpeakerIndex >= speakingOrder.length) {
+    // Cacher le bloc de tour
+    let speakingZone = document.getElementById("speakingZone");
+    if (speakingZone) {
+        speakingZone.classList.add("hidden");
+    }
+
+    startVote(); // Passe au vote après le dernier joueur
+    return;
+
+}
 
     showCurrentSpeaker();
 }
