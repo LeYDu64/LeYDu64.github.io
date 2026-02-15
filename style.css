@@ -1,0 +1,61 @@
+body{
+margin:0;
+font-family:'Georgia',serif;
+color:#f5deb3;
+text-align:center;
+background:radial-gradient(circle at top,#3b2a1d,#1a120b 60%);
+}
+
+.container{max-width:520px;margin:auto;padding:20px;}
+
+.logo{
+font-size:32px;
+font-weight:bold;
+color:gold;
+text-shadow:0 0 10px gold;
+margin-bottom:20px;
+}
+
+.card{
+background:linear-gradient(145deg,#2b1d13,#1a120b);
+padding:20px;
+margin-top:20px;
+border-radius:18px;
+box-shadow:0 0 25px rgba(255,215,0,0.2);
+border:1px solid rgba(255,215,0,0.2);
+}
+
+input{
+padding:10px;
+margin:6px;
+border-radius:8px;
+border:1px solid #b8860b;
+background:#1a120b;
+color:#f5deb3;
+}
+
+button{
+background:linear-gradient(145deg,#b8860b,#8b6508);
+border:none;
+padding:12px;
+margin:8px 0;
+width:100%;
+font-size:16px;
+border-radius:10px;
+color:white;
+cursor:pointer;
+font-weight:bold;
+}
+
+button:hover{
+background:linear-gradient(145deg,#d4af37,#a67c00);
+}
+
+.playerButton{
+background:linear-gradient(145deg,#5a3e2b,#3b2a1d);
+}
+
+.ruleBtn{background:#3e6b48;}
+.resetBtn{background:#6b2c2c;}
+
+.hidden{display:none;}
