@@ -365,7 +365,28 @@ voteButtons.appendChild(btn);
 }
 });
 }
+    
+function showDebrief() {
 
+    let debriefHTML = "<h3>📜 Débrief Final</h3>";
+
+    players.forEach(p => {
+
+        let roleIcon = "";
+
+        if (p.role === "Villageois") roleIcon = "👨‍🌾";
+        if (p.role === "Renégat") roleIcon = "🕵️";
+        if (p.role === "Idiot du Royaume") roleIcon = "🤡";
+
+        debriefHTML += `
+            <p>${roleIcon} <b>${p.name}</b> était ${p.role}</p>
+        `;
+    });
+
+    resultScreen.innerHTML += debriefHTML;
+    animate(resultScreen, "fadeIn");
+}
+    
 function eliminate(player){
 player.alive=false;
 voteScreen.classList.add("hidden");
@@ -390,6 +411,7 @@ let idiotsAlive = players.filter(p => p.role === "Idiot du Royaume" && p.alive).
 // Victoire Villageois → plus aucun Renégat ET plus aucun Idiot
 if (impostorsAlive === 0 && idiotsAlive === 0 && villagersAlive > 0) {
     resultScreen.innerHTML += "<h2>🎉 Victoire des Villageois</h2>";
+    showDebrief();
     resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
     return;
 }
@@ -397,6 +419,7 @@ if (impostorsAlive === 0 && idiotsAlive === 0 && villagersAlive > 0) {
 // Victoire Renégats → ils sont au moins aussi nombreux que les Villageois ET aucun Idiot
 if (impostorsAlive > 0 && impostorsAlive >= villagersAlive && idiotsAlive === 0) {
     resultScreen.innerHTML += "<h2>💀 Victoire des Renégats</h2>";
+    showDebrief();
     resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
     return;
 }
@@ -404,6 +427,7 @@ if (impostorsAlive > 0 && impostorsAlive >= villagersAlive && idiotsAlive === 0)
 // Victoire Idiots → plus aucun Villageois ET plus aucun Renégat
 if (villagersAlive === 0 && impostorsAlive === 0 && idiotsAlive > 0) {
     resultScreen.innerHTML += "<h2>🤡 Les Idiots dominent le Royaume ! 🤡</h2>";
+    showDebrief();
     resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
     return;
 }
