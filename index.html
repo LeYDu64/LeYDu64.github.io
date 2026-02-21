@@ -381,22 +381,35 @@ return;
 }
 }
 
-let impostorsAlive=players.filter(p=>p.role==="Renégat"&&p.alive).length;
-let villagersAlive=players.filter(p=>p.role==="Villageois"&&p.alive).length;
+let impostorsAlive = players.filter(p => p.role === "Renégat" && p.alive).length;
+let villagersAlive = players.filter(p => p.role === "Villageois" && p.alive).length;
+let idiotsAlive = players.filter(p => p.role === "Idiot du Royaume" && p.alive).length;
 
-if(impostorsAlive===0){
-resultScreen.innerHTML+="<h2>🎉 Victoire des Villageois</h2>";
-resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
-return;
+// 🔥 CONDITION : on continue tant qu'il reste plusieurs rôles
+
+// Victoire Villageois → plus aucun Renégat ET plus aucun Idiot
+if (impostorsAlive === 0 && idiotsAlive === 0 && villagersAlive > 0) {
+    resultScreen.innerHTML += "<h2>🎉 Victoire des Villageois</h2>";
+    resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
 }
 
-if(impostorsAlive>=villagersAlive){
-resultScreen.innerHTML+="<h2>💀 Victoire des Renégats</h2>";
-resultScreen.innerHTML+="<button onclick='location.reload()'>Nouvelle partie</button>";
-return;
+// Victoire Renégats → ils sont au moins aussi nombreux que les Villageois ET aucun Idiot
+if (impostorsAlive > 0 && impostorsAlive >= villagersAlive && idiotsAlive === 0) {
+    resultScreen.innerHTML += "<h2>💀 Victoire des Renégats</h2>";
+    resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
 }
 
-resultScreen.innerHTML+="<button onclick='nextRound()'>Continuer</button>";
+// Victoire Idiots → plus aucun Villageois ET plus aucun Renégat
+if (villagersAlive === 0 && impostorsAlive === 0 && idiotsAlive > 0) {
+    resultScreen.innerHTML += "<h2>🤡 Les Idiots dominent le Royaume ! 🤡</h2>";
+    resultScreen.innerHTML += "<button onclick='location.reload()'>Nouvelle partie</button>";
+    return;
+}
+
+// Sinon → on continue la partie
+resultScreen.innerHTML += "<button onclick='nextRound()'>Continuer</button>";
 }
 
 function nextRound(){
