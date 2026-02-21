@@ -186,13 +186,39 @@ const words=[
   ["Pepsi","Coca-Cola"], ["Ferrari","Lamborghini"],["Nike","Adidas"], ["Marvel","DC"],["Bitcoin","Ethereum"], ["Samsung","Apple"], ["Xbox","PlayStation"],["Windows","Mac"], ["Google","FireFox"],
   ["Airbnb","Hotel"], ["Uber","Taxi"],["Croissant","Pain au chocolat"], ["Fromage","Beurre"],["Bière","Vin"], ["Guitare","Piano"],["Drame","Comédie"], ["Action","Horreur"],["Zombie","Vampire"], 
   ["Dragon","Dinosaure"], ["Clown","Magicien"], ["Pluie","Orage"],["Désert","Savane"], ["Cinéma","Théâtre"],["PlayMobil","LEGO"],["Mario","Link"],["Zelda","Ganondorph"],["Feutre","Peinture"],["Croquis","Dessin"],
-  ["Château", "Forteresse"],
-        ["Dragon", "Serpent"],
-        ["Épée", "Dague"],
-        ["Couronne", "Diadème"],
-        ["Chevalier", "Soldat"]
+  ["Château", "Forteresse"],["Dragon", "Serpent"],["Épée", "Dague"],["Couronne", "Diadème"],["Chevalier", "Soldat"],["Lait","Jus d'orange"],["Beurre","Margarine"],["Sucre","Sel"],["Four","Micro-ondes"],
+ ["Brosse à dents","Dentifrice"],["Shampoing","Gel douche"],["Savon","Parfum"],["Stylo","Crayon"],["Gomme","Taille-crayon"],["Cahier","Agenda"],["Horloge","Montre"],["Calendrier","Planning"],["Lampe","Bougie"],
+["Canapé","Fauteuil"],["Lit","Hamac"],["Oreiller","Couette"],["Balai","Aspirateur"],["Clé","Serrure"],["Porte","Fenêtre"],["Pont","Tunnel"],["Route","Autoroute"],["Bus","Tramway"],
+["Phare","Lanterne"],["Île","Continent"],["Rivière","Lac"],["Volcan","Montagne"],["Tempête","Ouragan"],["Nuage","Brouillard"],["Éclair","Tonnerre"],["Arc-en-ciel","Aurore boréale"],
+["Serpent","Crocodile"],["Aigle","Faucon"],["Requin","Dauphin"],["Fourmi","Abeille"],["Papillon","Libellule"],["Boulon","Vis"],["Marteau","Tournevis"],["Scie","Perceuse"],
+["Prison","Tribunal"],["Avocat","Juge"],["Banque","Assurance"],["Billet","Pièce"],["Diamant","Or"],["Armure","Bouclier"],["Arc","Arbalète"],["Sorcière","Magicienne"],["Fantôme","Esprit"],["Monstre","Créature"],
+["Robot","Cyborg"],["Alien","Extraterrestre"],["Capitaine","Pirate"],["Ninja","Samouraï"],["Espion","Agent secret"],["Président","Ministre"],["Député","Sénateur"],["Professeur","Élève"],["Médecin","Infirmier"],
+["Journal","Télévision"],["Radio","Podcast"],["Youtubeur","Streamer"],["Influenceur","Blogueur"],["Clavier","Souris"],["Écran","Projecteur"],["Serveur","Client"],["Application","Logiciel"],
+["Virus","Antivirus"],["Hacker","Programmeur"],["Planète","Étoile"],["Galaxie","Univers"],["Mars","Jupiter"],["Mars","Planète Terre"],["Plume","Encre"],["Papier","Carton"],["Bouteille","Verre"],["Assiette","Bol"],
+["Fourchette","Couteau"],["Cuillère","Louche"],["Train","Métro"],["Scooter","Vélo"],["Feu","Incendie"],["Glacier","Iceberg"],["Cactus","Palmier"],["Rose","Tulipe"],["Champignon","Truffe"],["Blé","Maïs"],
+["Dauphin","Orque"],["Pieuvre","Calamar"],["Masque","Casque"],["Gant","Écharpe"],["Pull","Sweat"],["Jeans","Short"],["Bracelet","Collier"],["Bague","Boucle d'oreille"],["Taxi","Chauffeur"],["Pilote","Conducteur"],
+["Ski","Snowboard"],["Surf","Plongée"],["Course","Marathon"],["Boxe","Karaté"],["Gymnastique","Danse"],["Batterie","Violon"],["Micro","Casque audio"],["Studio","Scène"],["Théâtre","Opéra"],["Cirque","Carnaval"],
+["Démon","Ange"],["Paradis","Enfer"],["Explosion","Incendie"],["Accident","Panne"],["Secret","Mystère"],["Indice","Preuve"],["Courrier","Colis"],["Facture","Ticket"],["Coiffeur","Barbier"],["Maquillage","Rouge à lèvres"],
+["Château fort","Palais"],["Village","Capitale"],["Trône","Autel"],["Crypte","Donjon"],["Marché","Foire"],["Festival","Concert"],["Glace","Sorbet"],["Yaourt","Crème"],["Céréales","Granola"],["Gaufre","Crêpe"],
+["Burger","Hot-dog"],["Tacos","Burrito"],["Sushi","Makis"],["Ramen","Nouilles"],["Safari","Expédition"],["Explorateur","Aventurier"],["Trésor","Carte"],["Boussole","GPS"]
 ];
+let availableWords = [...words];
+function getRandomWordPair() {
 
+    if (availableWords.length === 0) {
+        alert("⚠️ Tous les mots ont été utilisés ! Réinitialisation automatique.");
+        availableWords = [...words];
+    }
+
+    const randomIndex = Math.floor(Math.random() * availableWords.length);
+    const selectedPair = availableWords[randomIndex];
+
+    // 🔥 On enlève la paire utilisée
+    availableWords.splice(randomIndex, 1);
+
+    return selectedPair;
+}
+    
 function animate(element, animation){
     element.classList.remove(animation);
     void element.offsetWidth;
@@ -287,7 +313,7 @@ return;
 
 players=[];
 
-let pair=words[Math.floor(Math.random()*words.length)];
+let pair = getRandomWordPair();
 villageWord=pair[0];
 impostorWord=pair[1];
 
